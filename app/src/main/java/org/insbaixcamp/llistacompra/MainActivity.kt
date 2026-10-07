@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import org.insbaixcamp.llistacompra.screens.ListsScreen
 import org.insbaixcamp.llistacompra.ui.theme.LlistaCompraTheme
 
 class MainActivity : ComponentActivity() {
@@ -28,7 +29,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             LlistaCompraTheme {
-                LlistaCompraApp()
+                ListsScreen()
             }
         }
     }
