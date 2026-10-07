@@ -1,8 +1,7 @@
 package org.insbaixcamp.llistacompra.model
 
-data class ShoppingList(
+data class Usuari(
     val id: String = "",
     val nom: String = "",
-    val propietariId: String = "",
-    val membres: List<String> = emptyList()
+    val email: String = ""
 )
