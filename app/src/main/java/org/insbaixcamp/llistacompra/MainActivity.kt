@@ -39,11 +39,10 @@ fun App() {
 
         if (showRegister) {
 
-            RegisterScreen(
-                onRegisterSuccess = {
-                    loggedIn = true
-                }
-            )
+            RegisterScreen() {
+                val toString = (true.also { loggedIn = it }).toString()
+                toString
+            }
 
         } else {
 

@@ -45,7 +45,7 @@ fun RegisterScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         OutlinedTextField(
-            value = email,
+            value =email,
             onValueChange = { email = it },
             label = { Text("Correo electrónico") },
             modifier = Modifier.fillMaxWidth()
@@ -99,7 +99,7 @@ fun RegisterScreen(
                 }
 
                 auth.createUserWithEmailAndPassword(
-                    email,
+                    email.trim(),
                     password
                 ).addOnCompleteListener { task ->
 
