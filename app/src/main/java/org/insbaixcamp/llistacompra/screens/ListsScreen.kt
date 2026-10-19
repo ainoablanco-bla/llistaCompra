@@ -1,4 +1,3 @@
-
 package org.insbaixcamp.llistacompra.screens
 
 import androidx.compose.foundation.layout.*
@@ -8,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import org.insbaixcamp.llistacompra.data.FirebaseRepository
+import org.insbaixcamp.llistacompra.model.Llista
 
 @Composable
 fun ListsScreen() {
@@ -16,29 +16,49 @@ fun ListsScreen() {
     val usuariId = FirebaseAuth.getInstance().currentUser?.uid
 
     var nomLlista by remember { mutableStateOf("") }
+
     var llistaSeleccionada by remember {
+        mutableStateOf<Llista?>(null)
+    }
+
+    var mostrarDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var guardant by remember {
+        mutableStateOf(false)
+    }
+
+    var llistes by remember {
+        mutableStateOf<List<Llista>>(emptyList())
+    }
+
+    var errorLlistes by remember {
         mutableStateOf<String?>(null)
     }
-    var mostrarDialog by remember { mutableStateOf(false) }
-    var guardant by remember { mutableStateOf(false) }
-    var llistes by remember { mutableStateOf<List<String>>(emptyList()) }
-    var errorLlistes by remember { mutableStateOf<String?>(null) }
-    var errorCreacio by remember { mutableStateOf<String?>(null) }
 
-    // Escuchar las listas guardadas en Firebase
+    var errorCreacio by remember {
+        mutableStateOf<String?>(null)
+    }
+
+    // Escoltar les llistes de Firebase
     DisposableEffect(usuariId) {
 
         val listener = if (usuariId != null) {
+
             repository.escoltarLlistes(
                 usuariId = usuariId,
+
                 onUpdate = {
                     llistes = it
                     errorLlistes = null
                 },
+
                 onError = {
                     errorLlistes = it
                 }
             )
+
         } else {
             null
         }
@@ -48,13 +68,17 @@ fun ListsScreen() {
         }
     }
 
+    // Si hem seleccionat una llista, mostrem el detall
     if (llistaSeleccionada != null) {
+
         DetallLlistaScreen(
-            nomLlista = llistaSeleccionada!!,
+            idLlista = llistaSeleccionada!!.id,
+            nomLlista = llistaSeleccionada!!.nom,
             onTornar = {
                 llistaSeleccionada = null
             }
         )
+
         return
     }
 
@@ -94,28 +118,30 @@ fun ListsScreen() {
             )
         }
 
-        // Mostrar las listas
         if (llistes.isEmpty() && errorLlistes == null) {
             Text("Encara no tens cap llista")
         }
 
-        llistes.forEach { nom ->
+        llistes.forEach { llista ->
+
             TextButton(
                 onClick = {
-                    llistaSeleccionada = nom
+                    llistaSeleccionada = llista
                 }
             ) {
-                Text(nom)
+                Text(llista.nom)
             }
         }
     }
 
-    // Ventana para crear una lista
+    // Finestra per crear una llista
     if (mostrarDialog) {
 
         AlertDialog(
             onDismissRequest = {
-                if (!guardant) mostrarDialog = false
+                if (!guardant) {
+                    mostrarDialog = false
+                }
             },
 
             title = {
@@ -123,12 +149,16 @@ fun ListsScreen() {
             },
 
             text = {
+
                 Column {
+
                     OutlinedTextField(
                         value = nomLlista,
+
                         onValueChange = {
                             nomLlista = it
                         },
+
                         label = {
                             Text("Nom de la llista")
                         }
@@ -144,11 +174,14 @@ fun ListsScreen() {
             },
 
             confirmButton = {
+
                 Button(
                     enabled = !guardant && nomLlista.isNotBlank(),
+
                     onClick = {
 
                         if (usuariId != null) {
+
                             guardant = true
                             errorCreacio = null
 
@@ -160,23 +193,35 @@ fun ListsScreen() {
                                 guardant = false
 
                                 if (correcte) {
+
                                     mostrarDialog = false
                                     nomLlista = ""
+
                                 } else {
-                                    errorCreacio = error
-                                        ?: "Error al crear la llista"
+
+                                    errorCreacio =
+                                        error ?: "Error al crear la llista"
                                 }
                             }
                         }
                     }
                 ) {
-                    Text(if (guardant) "Guardant..." else "Crear")
+
+                    Text(
+                        if (guardant) {
+                            "Guardant..."
+                        } else {
+                            "Crear"
+                        }
+                    )
                 }
             },
 
             dismissButton = {
+
                 TextButton(
                     enabled = !guardant,
+
                     onClick = {
                         mostrarDialog = false
                     }

@@ -1,21 +1,20 @@
-
 package org.insbaixcamp.llistacompra.data
 
-import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import org.insbaixcamp.llistacompra.model.Llista
+import org.insbaixcamp.llistacompra.model.Producte
 
 class FirebaseRepository {
 
     private val db = FirebaseFirestore.getInstance()
 
-    // Crear una lista nueva
     fun crearLlista(
         nom: String,
         propietariId: String,
-        onResult: (Boolean, String?) -> Unit
+        resultat: (Boolean, String?) -> Unit
     ) {
+
         val document = db.collection("Llista").document()
 
         val llista = Llista(
@@ -27,19 +26,16 @@ class FirebaseRepository {
 
         document.set(llista)
             .addOnSuccessListener {
-                Log.d("FIREBASE", "Llista creada correctament")
-                onResult(true, null)
+                resultat(true, null)
             }
             .addOnFailureListener { error ->
-                Log.e("FIREBASE", "Error al crear la llista", error)
-                onResult(false, error.message)
+                resultat(false, error.message)
             }
     }
 
-    // Obtener las listas del usuario
     fun escoltarLlistes(
         usuariId: String,
-        onUpdate: (List<String>) -> Unit,
+        onUpdate: (List<Llista>) -> Unit,
         onError: (String) -> Unit
     ): ListenerRegistration {
 
@@ -48,15 +44,35 @@ class FirebaseRepository {
             .addSnapshotListener { snapshot, error ->
 
                 if (error != null) {
-                    onError(error.message ?: "Error al carregar llistes")
+                    onError(error.message ?: "Error al carregar les llistes")
                     return@addSnapshotListener
                 }
 
-                val llistes = snapshot?.documents
-                    ?.mapNotNull { it.getString("nom") }
-                    ?: emptyList()
+                val llistes = snapshot?.documents?.mapNotNull {
+                    it.toObject(Llista::class.java)
+                } ?: emptyList()
 
                 onUpdate(llistes)
             }
+    }
+
+    fun afegirProducte(
+        idLlista: String,
+        nomProducte: String
+    ) {
+
+        val document = db
+            .collection("Llista")
+            .document(idLlista)
+            .collection("productes")
+            .document()
+
+        val producte = Producte(
+            id = document.id,
+            nom = nomProducte,
+            completat = false
+        )
+
+        document.set(producte)
     }
 }

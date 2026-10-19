@@ -57,3 +57,10 @@ fun App() {
         }
     }
 }
+
+@Composable
+fun AppPreview() {
+    LlistaCompraTheme {
+        App()
+    }
+}
