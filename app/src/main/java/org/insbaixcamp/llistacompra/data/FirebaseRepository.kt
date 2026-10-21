@@ -75,4 +75,29 @@ class FirebaseRepository {
 
         document.set(producte)
     }
+
+    fun escoltarProductes(
+        idLlista: String,
+        onUpdate: (List<Producte>) -> Unit,
+        onError: (String) -> Unit
+    ): ListenerRegistration {
+
+        return db
+            .collection("Llista")
+            .document(idLlista)
+            .collection("productes")
+            .addSnapshotListener { snapshot, error ->
+
+                if (error != null) {
+                    onError(error.message ?: "Error al carregar els productes")
+                    return@addSnapshotListener
+                }
+
+                val productes = snapshot?.documents?.mapNotNull {
+                    it.toObject(Producte::class.java)
+                } ?: emptyList()
+
+                onUpdate(productes)
+            }
+    }
 }

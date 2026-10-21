@@ -2,14 +2,11 @@ package org.insbaixcamp.llistacompra.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.insbaixcamp.llistacompra.data.FirebaseRepository
+import org.insbaixcamp.llistacompra.model.Producte
 
 @Composable
 fun DetallLlistaScreen(
@@ -18,10 +15,44 @@ fun DetallLlistaScreen(
     onTornar: () -> Unit
 ) {
 
-    val repository = FirebaseRepository()
+    val repository = remember { FirebaseRepository() }
 
-    var mostrarDialog by remember { mutableStateOf(false) }
-    var nomProducte by remember { mutableStateOf("") }
+    var mostrarDialog by remember {
+        mutableStateOf(false)
+    }
+
+    var nomProducte by remember {
+        mutableStateOf("")
+    }
+
+    var productes by remember {
+        mutableStateOf<List<Producte>>(emptyList())
+    }
+
+    var errorProductes by remember {
+        mutableStateOf<String?>(null)
+    }
+
+    // Escuchar los productos de esta lista
+    DisposableEffect(idLlista) {
+
+        val listener = repository.escoltarProductes(
+            idLlista = idLlista,
+
+            onUpdate = {
+                productes = it
+                errorProductes = null
+            },
+
+            onError = {
+                errorProductes = it
+            }
+        )
+
+        onDispose {
+            listener.remove()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -35,14 +66,54 @@ fun DetallLlistaScreen(
             Text("← Tornar")
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(
+            modifier = Modifier.height(20.dp)
+        )
 
         Text(
             text = nomLlista,
             style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(
+            modifier = Modifier.height(20.dp)
+        )
+
+        errorProductes?.let {
+
+            Text(
+                text = it,
+                color = MaterialTheme.colorScheme.error
+            )
+
+            Spacer(
+                modifier = Modifier.height(10.dp)
+            )
+        }
+
+        if (productes.isEmpty() && errorProductes == null) {
+
+            Text("Encara no hi ha productes")
+
+            Spacer(
+                modifier = Modifier.height(10.dp)
+            )
+        }
+
+        productes.forEach { producte ->
+
+            Text(
+                text = producte.nom
+            )
+
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+        }
+
+        Spacer(
+            modifier = Modifier.height(10.dp)
+        )
 
         Button(
             onClick = {
@@ -65,11 +136,14 @@ fun DetallLlistaScreen(
             },
 
             text = {
+
                 OutlinedTextField(
                     value = nomProducte,
+
                     onValueChange = {
                         nomProducte = it
                     },
+
                     label = {
                         Text("Nom del producte")
                     }
@@ -77,6 +151,7 @@ fun DetallLlistaScreen(
             },
 
             confirmButton = {
+
                 Button(
                     onClick = {
 
@@ -84,7 +159,7 @@ fun DetallLlistaScreen(
 
                             repository.afegirProducte(
                                 idLlista = idLlista,
-                                nomProducte = nomProducte
+                                nomProducte = nomProducte.trim()
                             )
 
                             nomProducte = ""
@@ -97,6 +172,7 @@ fun DetallLlistaScreen(
             },
 
             dismissButton = {
+
                 TextButton(
                     onClick = {
                         mostrarDialog = false
