@@ -1,4 +1,4 @@
-package org.insbaixcamp.llistacompra
+package org.insbaixcamp.llistacompra.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,15 +24,16 @@ import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun RegisterScreen(
-    onRegisterSuccess: () -> Unit
+fun LoginScreen(
+    onLoginSuccess: () -> Unit,
+    onRegisterClick: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var repeatPassword by remember { mutableStateOf("") }
 
     val context = LocalContext.current
     val auth = FirebaseAuth.getInstance()
+
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -41,7 +43,7 @@ fun RegisterScreen(
     ) {
 
         Text(
-            text = "Crear cuenta"
+            text = "Iniciar sesión"
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -67,77 +69,62 @@ fun RegisterScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = repeatPassword,
-            onValueChange = { repeatPassword = it },
-            label = {
-                Text("Repetir contraseña")
-            },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
-        )
-
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
             onClick = {
 
-                if (email.isBlank() ||
-                    password.isBlank() ||
-                    repeatPassword.isBlank()
-                ) {
+                if (email.isBlank() || password.isBlank()) {
+
                     Toast.makeText(
                         context,
                         "Rellena todos los campos",
                         Toast.LENGTH_SHORT
                     ).show()
 
-                    return@Button
-                }
+                } else {
 
-                if (password != repeatPassword) {
-                    Toast.makeText(
-                        context,
-                        "Las contraseñas no coinciden",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    auth.signInWithEmailAndPassword(
+                        email,
+                        password
+                    ).addOnCompleteListener { task ->
 
-                    return@Button
-                }
+                        if (task.isSuccessful) {
 
-                auth.createUserWithEmailAndPassword(
-                    email,
-                    password
-                ).addOnCompleteListener { task ->
+                            Toast.makeText(
+                                context,
+                                "Inicio de sesión correcto",
+                                Toast.LENGTH_SHORT
+                            ).show()
 
-                    if (task.isSuccessful) {
+                            onLoginSuccess()
 
-                        Toast.makeText(
-                            context,
-                            "Cuenta creada correctamente",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        } else {
 
-                        onRegisterSuccess()
-
-                    } else {
-
-                        Toast.makeText(
-                            context,
-                            task.exception?.message
-                                ?: "Error al crear la cuenta",
-                            Toast.LENGTH_LONG
-                        ).show()
+                            Toast.makeText(
+                                context,
+                                "Correo o contraseña incorrectos",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Registrarse")
+            Text("Iniciar sesión")
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        TextButton(
+            onClick = {
+                onRegisterClick()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("¿No tienes cuenta? Crear cuenta")
         }
     }
 }
-
 
