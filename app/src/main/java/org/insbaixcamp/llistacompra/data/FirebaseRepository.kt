@@ -99,19 +99,48 @@ class FirebaseRepository {
 
                 onUpdate(productes)
             }
-        fun canviarCompletat(
-            idLlista: String,
-            idProducte: String,
-            completat: Boolean
-        ) {
-
-            db.collection("Llista")
-                .document(idLlista)
-                .collection("productes")
-                .document(idProducte)
-                .update("completat", completat)
-        }
     }
+    fun canviarCompletat(
+        idLlista: String,
+        idProducte: String,
+        completat: Boolean,
+    ) {
+
+
+        db.collection("Llista")
+            .document(idLlista)
+            .collection("productes")
+            .document(idProducte)
+            .update("completat", completat)
+    }
+
+    fun editarProducte(
+        idLlista: String,
+        idProducte: String,
+        nouNom: String
+    ) {
+
+        db.collection("Llista")
+            .document(idLlista)
+            .collection("productes")
+            .document(idProducte)
+            .update("nom", nouNom)
+    }
+
+    fun eliminarProducte(
+        idLlista: String,
+        idProducte: String
+    ) {
+        db.collection("Llista")
+            .document(idLlista)
+            .collection("productes")
+            .document(idProducte)
+            .delete()
+    }
+
+
 }
+
+
 
 
