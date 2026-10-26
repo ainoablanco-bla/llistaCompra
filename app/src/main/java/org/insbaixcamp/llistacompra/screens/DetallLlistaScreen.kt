@@ -102,9 +102,27 @@ fun DetallLlistaScreen(
 
         productes.forEach { producte ->
 
-            Text(
-                text = producte.nom
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+
+                Checkbox(
+                    checked = producte.completat,
+                    onCheckedChange = { marcat ->
+
+                        repository.canviarCompletat(
+                            idLlista = idLlista,
+                            idProducte = producte.id,
+                            completat = marcat
+                        )
+                    }
+                )
+
+                Text(
+                    text = producte.nom,
+                    modifier = Modifier.padding(top = 12.dp)
+                )
+            }
 
             Spacer(
                 modifier = Modifier.height(8.dp)

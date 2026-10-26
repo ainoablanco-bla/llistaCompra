@@ -99,5 +99,19 @@ class FirebaseRepository {
 
                 onUpdate(productes)
             }
+        fun canviarCompletat(
+            idLlista: String,
+            idProducte: String,
+            completat: Boolean
+        ) {
+
+            db.collection("Llista")
+                .document(idLlista)
+                .collection("productes")
+                .document(idProducte)
+                .update("completat", completat)
+        }
     }
 }
+
+
