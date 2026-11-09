@@ -118,6 +118,22 @@ class FirebaseRepository {
     }
 
 
+    fun eliminarLlista(
+        idLlista: String,
+        resultat: (Boolean, String?) -> Unit
+    ) {
+        db.collection("Llista")
+            .document(idLlista)
+            .delete()
+            .addOnSuccessListener {
+                resultat(true, null)
+            }
+            .addOnFailureListener { error ->
+                resultat(false, error.message)
+            }
+    }
+
+
     // -------------------------
     // COMPARTIR LLISTA
     // -------------------------

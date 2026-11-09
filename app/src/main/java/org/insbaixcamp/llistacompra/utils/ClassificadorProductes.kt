@@ -1,11 +1,9 @@
 package org.insbaixcamp.llistacompra.utils
 
 fun obtenirCategoria(nomProducte: String): String {
-
     val nom = nomProducte.lowercase().trim()
 
     return when {
-
         // LÀCTICS
         nom.contains("llet") ||
                 nom.contains("formatge") ||
@@ -17,7 +15,6 @@ fun obtenirCategoria(nomProducte: String): String {
                 nom.contains("parmesà") ||
                 nom.contains("queso") ->
             "Làctics"
-
 
         // FRUITA I VERDURA
         nom.contains("poma") ||
@@ -58,7 +55,6 @@ fun obtenirCategoria(nomProducte: String): String {
                 nom.contains("cogombre") ->
             "Fruita i verdura"
 
-
         // CARN I PEIX
         nom.contains("pollastre") ||
                 nom.contains("vedella") ||
@@ -85,7 +81,6 @@ fun obtenirCategoria(nomProducte: String): String {
                 nom.contains("musclos") ->
             "Carn i peix"
 
-
         // PA I CEREALS
         nom == "pa" ||
                 nom.contains("baguette") ||
@@ -103,7 +98,6 @@ fun obtenirCategoria(nomProducte: String): String {
                 nom.contains("cuscús") ->
             "Pa i cereals"
 
-
         // BEGUDES
         nom.contains("aigua") ||
                 nom.contains("coca-cola") ||
@@ -120,7 +114,6 @@ fun obtenirCategoria(nomProducte: String): String {
                 nom == "te" ->
             "Begudes"
 
-
         // CONGELATS
         nom.contains("pizza congelada") ||
                 nom.contains("gelat") ||
@@ -132,7 +125,6 @@ fun obtenirCategoria(nomProducte: String): String {
                 nom.contains("peix congelat") ||
                 nom.contains("lasanya congelada") ->
             "Congelats"
-
 
         // NETEJA
         nom.contains("lleixiu") ||
@@ -149,7 +141,6 @@ fun obtenirCategoria(nomProducte: String): String {
                 nom.contains("esponja") ||
                 nom.contains("fregall") ->
             "Neteja"
-
 
         // HIGIENE PERSONAL
         nom.contains("xampú") ||
@@ -169,8 +160,91 @@ fun obtenirCategoria(nomProducte: String): String {
                 nom.contains("colonia") ->
             "Higiene personal"
 
-
         else ->
             "Altres"
+    }
+}
+
+fun obtenirEmojiCategoria(nomCategoria: String): String {
+    val nom = nomCategoria.lowercase().trim()
+    return when {
+        nom.contains("fruita") || nom.contains("verdura") -> "🥬"
+        nom.contains("carn") || nom.contains("peix") -> "🥩"
+        nom.contains("làctic") || nom.contains("lactic") -> "🧀"
+        nom.contains("pa") || nom.contains("cereal") -> "🍞"
+        nom.contains("beguda") -> "🧃"
+        nom.contains("congelat") -> "🧊"
+        nom.contains("neteja") -> "🧹"
+        nom.contains("higiene") || nom.contains("personal") -> "🧴"
+        else -> "📦"
+    }
+}
+
+fun obtenirEmojiProducte(nomProducte: String): String {
+    val nom = nomProducte.lowercase().trim()
+    return when {
+        // Fruita i verdura
+        nom.contains("poma") || nom.contains("pomes") -> "🍎"
+        nom.contains("plàtan") || nom.contains("platan") || nom.contains("banana") -> "🍌"
+        nom.contains("taronja") || nom.contains("mandarina") -> "🍊"
+        nom.contains("pera") -> "🍐"
+        nom.contains("maduixa") -> "🍓"
+        nom.contains("síndria") || nom.contains("sindria") -> "🍉"
+        nom.contains("meló") || nom.contains("melo") -> "🍈"
+        nom.contains("pinya") -> "🍍"
+        nom.contains("llimona") -> "🍋"
+        nom.contains("raïm") || nom.contains("raim") -> "🍇"
+        nom.contains("tomàquet") || nom.contains("tomaquet") -> "🍅"
+        nom.contains("enciam") -> "🥬"
+        nom.contains("pastanaga") -> "🥕"
+        nom.contains("patata") -> "🥔"
+        nom.contains("ceba") -> "🧅"
+        nom.contains("all") -> "🧄"
+        nom.contains("bròquil") || nom.contains("broquil") -> "🥦"
+        nom.contains("pebrot") -> "🫑"
+        nom.contains("alvocat") -> "🥑"
+
+        // Làctics
+        nom.contains("llet") -> "🥛"
+        nom.contains("formatge") || nom.contains("queso") -> "🧀"
+        nom.contains("iogurt") -> "🍦"
+        nom.contains("mantega") -> "🧈"
+
+        // Carn i Peix
+        nom.contains("pollastre") -> "🍗"
+        nom.contains("hamburguesa") -> "🍔"
+        nom.contains("salsitxa") || nom.contains("botifarra") -> "🌭"
+        nom.contains("pernil") || nom.contains("vedella") || nom.contains("porc") -> "🥩"
+        nom.contains("peix") || nom.contains("salmó") || nom.contains("tonyina") || nom.contains("lluç") -> "🐟"
+        nom.contains("gamba") || nom.contains("gambes") || nom.contains("llagostí") -> "🦐"
+
+        // Pa i Cereals
+        nom == "pa" || nom.contains("baguette") || nom.contains("barra") -> "🥖"
+        nom.contains("pa de motlle") -> "🍞"
+        nom.contains("arròs") || nom.contains("arros") -> "🍚"
+        nom.contains("pasta") || nom.contains("macarró") || nom.contains("espagueti") -> "🍝"
+        nom.contains("galeta") || nom.contains("galetes") -> "🍪"
+        nom.contains("croissant") -> "🥐"
+
+        // Begudes
+        nom.contains("aigua") -> "💧"
+        nom.contains("cafè") || nom.contains("cafe") -> "☕"
+        nom.contains("te") || nom.contains("infusió") -> "🫖"
+        nom.contains("suc") -> "🧃"
+        nom.contains("cervesa") -> "🍺"
+        nom.contains("vi") -> "🍷"
+        nom.contains("coca") || nom.contains("refresc") -> "🥤"
+
+        // Congelats & Altres
+        nom.contains("pizza") -> "🍕"
+        nom.contains("gelat") -> "🍨"
+        nom.contains("xocolata") || nom.contains("chocolate") -> "🍫"
+        nom.contains("paper") -> "🧻"
+        nom.contains("sabó") || nom.contains("sabo") || nom.contains("gel") -> "🧼"
+
+        else -> {
+            val cat = obtenirCategoria(nomProducte)
+            obtenirEmojiCategoria(cat)
+        }
     }
 }

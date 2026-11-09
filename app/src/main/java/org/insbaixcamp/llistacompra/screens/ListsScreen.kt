@@ -1,7 +1,6 @@
 package org.insbaixcamp.llistacompra.screens
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,18 +9,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import org.insbaixcamp.llistacompra.data.FirebaseRepository
 import org.insbaixcamp.llistacompra.model.Categoria
 import org.insbaixcamp.llistacompra.model.Llista
-
+import org.insbaixcamp.llistacompra.utils.obtenirEmojiCategoria
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,6 +34,7 @@ fun ListsScreen(
 
     var nomLlista by remember { mutableStateOf("") }
     var llistaSeleccionada by remember { mutableStateOf<Llista?>(null) }
+    var llistaEliminar by remember { mutableStateOf<Llista?>(null) }
     var mostrarCategories by remember { mutableStateOf(false) }
     var mostrarDialog by remember { mutableStateOf(false) }
     var guardant by remember { mutableStateOf(false) }
@@ -88,7 +89,7 @@ fun ListsScreen(
                 title = {
                     Column {
                         Text(
-                            text = "Les meves llistes",
+                            text = "Les meves llistes 📝",
                             style = MaterialTheme.typography.titleLarge
                         )
                         currentUser?.email?.let { email ->
@@ -107,7 +108,7 @@ fun ListsScreen(
                             onLogout()
                         }) {
                             Icon(
-                                imageVector = Icons.Default.Logout,
+                                imageVector = Icons.AutoMirrored.Filled.Logout,
                                 contentDescription = "Tancar sessió"
                             )
                         }
@@ -126,7 +127,7 @@ fun ListsScreen(
                         errorCreacio = null
                     },
                     icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                    text = { Text("Nova llista") },
+                    text = { Text("Nova llista 🛍️") },
                     shape = RoundedCornerShape(16.dp),
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
@@ -193,11 +194,9 @@ fun ListsScreen(
                             modifier = Modifier.size(80.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    imageVector = Icons.Default.Checklist,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(40.dp)
+                                Text(
+                                    text = "🛒",
+                                    fontSize = 36.sp
                                 )
                             }
                         }
@@ -213,7 +212,7 @@ fun ListsScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Crea la teva primera llista de la compra premi el botó + Nova llista",
+                            text = "Crea la teva primera llista de la compra premint + Nova llista",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -239,7 +238,7 @@ fun ListsScreen(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(18.dp),
+                                        .padding(start = 16.dp, end = 8.dp, top = 14.dp, bottom = 14.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Surface(
@@ -248,16 +247,14 @@ fun ListsScreen(
                                         modifier = Modifier.size(44.dp)
                                     ) {
                                         Box(contentAlignment = Alignment.Center) {
-                                            Icon(
-                                                imageVector = Icons.Default.ShoppingBag,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.primary,
-                                                modifier = Modifier.size(22.dp)
+                                            Text(
+                                                text = "🛒",
+                                                fontSize = 20.sp
                                             )
                                         }
                                     }
 
-                                    Spacer(modifier = Modifier.width(16.dp))
+                                    Spacer(modifier = Modifier.width(14.dp))
 
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(
@@ -267,11 +264,23 @@ fun ListsScreen(
                                         )
                                         if (llista.membres.size > 1) {
                                             Text(
-                                                text = "Compartida amb ${llista.membres.size - 1} persones",
+                                                text = "👥 Compartida (${llista.membres.size} persones)",
                                                 style = MaterialTheme.typography.labelMedium,
                                                 color = MaterialTheme.colorScheme.primary
                                             )
                                         }
+                                    }
+
+                                    // Delete list button
+                                    IconButton(
+                                        onClick = { llistaEliminar = llista }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = "Eliminar llista",
+                                            tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
+                                            modifier = Modifier.size(20.dp)
+                                        )
                                     }
 
                                     Icon(
@@ -297,7 +306,7 @@ fun ListsScreen(
             shape = RoundedCornerShape(24.dp),
             title = {
                 Text(
-                    text = "Nova llista",
+                    text = "Nova llista 🛍️",
                     style = MaterialTheme.typography.titleLarge
                 )
             },
@@ -307,7 +316,7 @@ fun ListsScreen(
                         value = nomLlista,
                         onValueChange = { nomLlista = it },
                         label = { Text("Nom de la llista") },
-                        placeholder = { Text("Ex: Supermercat, Farmàcia...") },
+                        placeholder = { Text("Ex: Supermercat, Fruiteria...") },
                         singleLine = true,
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth()
@@ -368,6 +377,41 @@ fun ListsScreen(
             }
         )
     }
+
+    // Confirm Delete Entire List Dialog
+    if (llistaEliminar != null) {
+        AlertDialog(
+            onDismissRequest = { llistaEliminar = null },
+            shape = RoundedCornerShape(24.dp),
+            title = { Text("Eliminar llista 🗑️") },
+            text = {
+                Text(
+                    text = "Segur que vols eliminar la llista \"${llistaEliminar!!.nom}\"? Aquesta acció esborrarà tots els seus productes i categories.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            confirmButton = {
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    onClick = {
+                        val idAEliminar = llistaEliminar!!.id
+                        llistaEliminar = null
+                        repository.eliminarLlista(idAEliminar) { _, _ -> }
+                    }
+                ) {
+                    Text("Eliminar llista")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { llistaEliminar = null }) {
+                    Text("Cancel·lar")
+                }
+            }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -401,7 +445,7 @@ fun CategoriesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Categories de la llista") },
+                title = { Text("Categories 🏷️") },
                 navigationIcon = {
                     IconButton(onClick = onTornar) {
                         Icon(
@@ -479,11 +523,9 @@ fun CategoriesScreen(
                                         .padding(horizontal = 16.dp, vertical = 12.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Category,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(20.dp)
+                                    Text(
+                                        text = obtenirEmojiCategoria(cat.nom),
+                                        fontSize = 20.sp
                                     )
                                     Spacer(modifier = Modifier.width(14.dp))
                                     Text(
@@ -526,7 +568,7 @@ fun CategoriesScreen(
         AlertDialog(
             onDismissRequest = { mostrarDialog = false },
             shape = RoundedCornerShape(24.dp),
-            title = { Text("Nova categoria") },
+            title = { Text("Nova categoria 🏷️") },
             text = {
                 OutlinedTextField(
                     value = nomCategoria,

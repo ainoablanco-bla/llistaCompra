@@ -1,10 +1,8 @@
 package org.insbaixcamp.llistacompra.screens
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -14,12 +12,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.insbaixcamp.llistacompra.data.FirebaseRepository
 import org.insbaixcamp.llistacompra.model.Categoria
 import org.insbaixcamp.llistacompra.model.Producte
+import org.insbaixcamp.llistacompra.utils.obtenirEmojiCategoria
+import org.insbaixcamp.llistacompra.utils.obtenirEmojiProducte
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,6 +39,7 @@ fun DetallLlistaScreen(
     var producteEditar by remember { mutableStateOf<Producte?>(null) }
     var nouNomProducte by remember { mutableStateOf("") }
     var producteEliminar by remember { mutableStateOf<Producte?>(null) }
+    var eliminarLlistaConfirm by remember { mutableStateOf(false) }
     var mostrarCompartir by remember { mutableStateOf(false) }
     var emailCompartir by remember { mutableStateOf("") }
     var missatgeCompartir by remember { mutableStateOf<String?>(null) }
@@ -99,6 +100,13 @@ fun DetallLlistaScreen(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
+                    IconButton(onClick = { eliminarLlistaConfirm = true }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Eliminar llista",
+                            tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
@@ -109,7 +117,7 @@ fun DetallLlistaScreen(
             ExtendedFloatingActionButton(
                 onClick = { mostrarDialog = true },
                 icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                text = { Text("Afegir producte") },
+                text = { Text("Afegir producte 🛒") },
                 shape = RoundedCornerShape(16.dp),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
@@ -162,11 +170,9 @@ fun DetallLlistaScreen(
                             modifier = Modifier.size(72.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    imageVector = Icons.Default.ShoppingCart,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(36.dp)
+                                Text(
+                                    text = "🛍️",
+                                    fontSize = 32.sp
                                 )
                             }
                         }
@@ -203,15 +209,24 @@ fun DetallLlistaScreen(
                                     Column {
                                         Surface(
                                             shape = RoundedCornerShape(8.dp),
-                                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+                                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f),
                                             modifier = Modifier.padding(vertical = 4.dp)
                                         ) {
-                                            Text(
-                                                text = categoria.nom.uppercase(),
-                                                style = MaterialTheme.typography.labelMedium,
-                                                color = MaterialTheme.colorScheme.primary,
-                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-                                            )
+                                            Row(
+                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Text(
+                                                    text = obtenirEmojiCategoria(categoria.nom),
+                                                    fontSize = 14.sp
+                                                )
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Text(
+                                                    text = categoria.nom.uppercase(),
+                                                    style = MaterialTheme.typography.labelMedium,
+                                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                                )
+                                            }
                                         }
 
                                         Spacer(modifier = Modifier.height(8.dp))
@@ -248,15 +263,21 @@ fun DetallLlistaScreen(
                                     if (categories.isNotEmpty() && productsCategorized.isNotEmpty()) {
                                         Surface(
                                             shape = RoundedCornerShape(8.dp),
-                                            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                                            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f),
                                             modifier = Modifier.padding(vertical = 4.dp)
                                         ) {
-                                            Text(
-                                                text = "ALTRES",
-                                                style = MaterialTheme.typography.labelMedium,
-                                                color = MaterialTheme.colorScheme.secondary,
-                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-                                            )
+                                            Row(
+                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Text(text = "📦", fontSize = 14.sp)
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Text(
+                                                    text = "ALTRES",
+                                                    style = MaterialTheme.typography.labelMedium,
+                                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                                )
+                                            }
                                         }
 
                                         Spacer(modifier = Modifier.height(8.dp))
@@ -295,7 +316,7 @@ fun DetallLlistaScreen(
         AlertDialog(
             onDismissRequest = { mostrarDialog = false },
             shape = RoundedCornerShape(24.dp),
-            title = { Text("Afegir producte") },
+            title = { Text("Afegir producte 🛒") },
             text = {
                 OutlinedTextField(
                     value = nomProducte,
@@ -406,12 +427,42 @@ fun DetallLlistaScreen(
         )
     }
 
+    // Dialog Confirmar Eliminar Llista
+    if (eliminarLlistaConfirm) {
+        AlertDialog(
+            onDismissRequest = { eliminarLlistaConfirm = false },
+            shape = RoundedCornerShape(24.dp),
+            title = { Text("Eliminar llista 🗑️") },
+            text = { Text("Segur que vols eliminar tota la llista \"$nomLlista\"?") },
+            confirmButton = {
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    onClick = {
+                        eliminarLlistaConfirm = false
+                        repository.eliminarLlista(idLlista) { _, _ -> }
+                        onTornar()
+                    }
+                ) {
+                    Text("Eliminar llista")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { eliminarLlistaConfirm = false }) {
+                    Text("Cancel·lar")
+                }
+            }
+        )
+    }
+
     // Dialog Compartir Llista
     if (mostrarCompartir) {
         AlertDialog(
             onDismissRequest = { mostrarCompartir = false },
             shape = RoundedCornerShape(24.dp),
-            title = { Text("Compartir llista") },
+            title = { Text("Compartir llista 🤝") },
             text = {
                 Column {
                     Text(
@@ -477,6 +528,8 @@ fun ProductItemRow(
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
+    val emoji = remember(producte.nom) { obtenirEmojiProducte(producte.nom) }
+
     Card(
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
@@ -504,6 +557,12 @@ fun ProductItemRow(
             )
 
             Text(
+                text = emoji,
+                fontSize = 18.sp,
+                modifier = Modifier.padding(end = 6.dp)
+            )
+
+            Text(
                 text = producte.nom,
                 style = MaterialTheme.typography.bodyLarge.copy(
                     textDecoration = if (producte.completat) TextDecoration.LineThrough else TextDecoration.None
@@ -515,7 +574,7 @@ fun ProductItemRow(
                 },
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 8.dp)
+                    .padding(end = 4.dp)
             )
 
             IconButton(onClick = onEdit) {
