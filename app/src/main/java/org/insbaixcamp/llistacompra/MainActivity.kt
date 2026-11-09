@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
+import com.google.firebase.auth.FirebaseAuth
+import org.insbaixcamp.llistacompra.data.FirebaseRepository
 import org.insbaixcamp.llistacompra.screens.ListsScreen
 import org.insbaixcamp.llistacompra.screens.LoginScreen
 import org.insbaixcamp.llistacompra.screens.RegisterScreen
@@ -20,35 +22,52 @@ class MainActivity : ComponentActivity() {
             LlistaCompraTheme {
                 App()
             }
+            }
+
         }
     }
-}
 
 @Composable
 fun App() {
-
-    var loggedIn by remember { mutableStateOf(false) }
+    var currentUser by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser) }
     var showRegister by remember { mutableStateOf(false) }
 
-    if (loggedIn) {
+    DisposableEffect(Unit) {
+        val authListener = FirebaseAuth.AuthStateListener { auth ->
+            currentUser = auth.currentUser
+        }
+        FirebaseAuth.getInstance().addAuthStateListener(authListener)
+        onDispose {
+            FirebaseAuth.getInstance().removeAuthStateListener(authListener)
+        }
+    }
 
-        // Usuario ha iniciado sesión
-        ListsScreen()
+    if (currentUser != null) {
+        val user = currentUser!!
+        LaunchedEffect(user.uid) {
+            val repository = FirebaseRepository()
+            repository.guardarUsuari(
+                uid = user.uid,
+                email = user.email ?: ""
+            )
+        }
 
-    } else {
-
-        if (showRegister) {
-
-            RegisterScreen() {
-                val toString = (true.also { loggedIn = it }).toString()
-                toString
+        ListsScreen(
+            onLogout = {
+                currentUser = null
             }
-
+        )
+    } else {
+        if (showRegister) {
+            RegisterScreen(
+                onRegisterSuccess = {
+                    currentUser = FirebaseAuth.getInstance().currentUser
+                }
+            )
         } else {
-
             LoginScreen(
                 onLoginSuccess = {
-                    loggedIn = true
+                    currentUser = FirebaseAuth.getInstance().currentUser
                 },
                 onRegisterClick = {
                     showRegister = true
@@ -58,9 +77,8 @@ fun App() {
     }
 }
 
-@Composable
-fun AppPreview() {
-    LlistaCompraTheme {
-        App()
-    }
-}
+
+
+
+
+
